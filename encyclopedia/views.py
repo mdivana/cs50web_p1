@@ -15,7 +15,7 @@ def entrypage(request, entry):
     if page is None:
         return render(request, "encyclopedia/noenrty.html", {"entrytitle": entry})
     else:
-        return render(request, "encyclopedia/entry.html", {
+        return render(request, "encyclopedia/entrypage.html", {
             "entry": Markdown().convert(page),
             "entrytitle": entry,
         })
