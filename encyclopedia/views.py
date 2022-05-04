@@ -1,10 +1,7 @@
-from audioop import reverse
-from curses import update_lines_cols
-from multiprocessing.sharedctypes import Value
+from django.urls import reverse
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from markdown2 import Markdown
-
 from . import util
 
 
@@ -13,28 +10,36 @@ def index(request):
         "entries": util.list_entries()
     })
 
+def converter(entry):
+    html = Markdown().convert(util.get_entry(entry)) if entry else None
+    return html
+
 def entrypage(request, entry):
-    page = util.get_entry(entry)
-    if page is None:
+    html = converter(entry)
+    if html is None:
         return render(request, "encyclopedia/noenrty.html", {"entrytitle": entry})
     else:
         return render(request, "encyclopedia/entrypage.html", {
-            "entry": Markdown().convert(page),
+            "entry": html,
             "entrytitle": entry,
         })
 
 def search(request):
-    searchres = request.GET.get('q')
-    if(util.get_entry(searchres) is not None):
-        return HttpResponseRedirect(reverse('entry', kwargs = {'entry': searchres }))
-    else:
-        entrylist = []
-        for entry in util.list_entries():
-            if searchres.lower() in entry.lower():
-                entrylist.append(entry)
+    if request.method == "POST":
+        query = request.POST['q']
+        html = converter(query)
 
-        return render(request, "encyclopedia?index.html", {
-            "entries": entrylist,
-            "search": True,
-            "value": searchres
-        })
+        entries = util.list_entries()
+        if query in entries:
+            return render(request, "encyclopedia/entrypage.html",{
+                "entry": html,
+                "entrytitle": query,
+            })
+        else:
+            entry_list = []
+            for entry in entries:
+                if query in entry:
+                    entry_list.append(entry)
+            return render(request, "encyclopedia/index.html", {
+                "entries": entry_list,
+            })
