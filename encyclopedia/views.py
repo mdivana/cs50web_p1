@@ -25,21 +25,17 @@ def entrypage(request, entry):
         })
 
 def search(request):
-    if request.method == "POST":
-        query = request.POST['q']
-        html = converter(query)
-
-        entries = util.list_entries()
-        if query in entries:
-            return render(request, "encyclopedia/entrypage.html",{
-                "entry": html,
-                "entrytitle": query,
-            })
-        else:
-            entry_list = []
-            for entry in entries:
-                if query in entry:
-                    entry_list.append(entry)
-            return render(request, "encyclopedia/index.html", {
-                "entries": entry_list,
-            })
+    query = request.GET.get('q','')
+    entries = util.list_entries()
+    if (util.get_entry(query) is not None):
+        return HttpResponseRedirect(reverse("entry", kwargs={'entry': query}))
+    else:
+        entry_list = []
+        for entry in entries:
+            if query.lower() in entry.lower():
+                entry_list.append(entry)
+        return render(request, "encyclopedia/index.html", {
+            "entries": entry_list,
+            "search": True,
+            "query": query,
+        })
