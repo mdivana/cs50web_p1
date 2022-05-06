@@ -17,18 +17,23 @@ def converter(entry):
 def entrypage(request, entry):
     html = converter(entry)
     if html is None:
-        return render(request, "encyclopedia/noenrty.html", {"entrytitle": entry})
+        return render(request, "encyclopedia/noenrty.html", {
+            "entrytitle": entry
+        })
     else:
         return render(request, "encyclopedia/entrypage.html", {
             "entry": html,
             "entrytitle": entry,
         })
 
-def search(request):
+def searchpage(request):
     query = request.GET.get('q','')
     entries = util.list_entries()
+    html = converter(query)
     if (util.get_entry(query) is not None):
-        return HttpResponseRedirect(reverse("entry", kwargs={'entry': query}))
+        return render(request, "encyclopedia/entrypage.html", {
+            "entry": html
+            })
     else:
         entry_list = []
         for entry in entries:
@@ -39,3 +44,20 @@ def search(request):
             "search": True,
             "query": query,
         })
+
+def newpage(request):
+    return render(request, "encyclopedia/newpage.html")
+
+def savepage(request):
+    if request.method == "POST":
+        title = request.POST('title')
+        text = request.POST('text')
+        html = converter(title)
+        if title in util.list_entries():
+            return render(request, "encyclopedia/alreadyexists.html")
+        else:
+            util.save_entry(title, text)
+            html = converter(title)
+            return render(request, "encyclopedia/entrypage.html", {
+                "entry": html
+            })
