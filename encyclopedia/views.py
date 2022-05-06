@@ -50,14 +50,16 @@ def newpage(request):
 
 def savepage(request):
     if request.method == "POST":
-        title = request.POST('title')
-        text = request.POST('text')
-        html = converter(title)
+        title = request.POST['newpagetitle']
+        text = "#"+title+"\n\n"+request.POST['newpagetext']
         if title in util.list_entries():
             return render(request, "encyclopedia/alreadyexists.html")
+        elif title is "":
+            return render(request, "encyclopedia/newpage.html")
         else:
             util.save_entry(title, text)
             html = converter(title)
             return render(request, "encyclopedia/entrypage.html", {
+                "entrytitle": title,
                 "entry": html
             })
