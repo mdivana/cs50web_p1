@@ -54,12 +54,32 @@ def savepage(request):
         text = "#"+title+"\n\n"+request.POST['newpagetext']
         if title in util.list_entries():
             return render(request, "encyclopedia/alreadyexists.html")
-        elif title is "":
+        elif title == "":
             return render(request, "encyclopedia/newpage.html")
         else:
             util.save_entry(title, text)
             html = converter(title)
             return render(request, "encyclopedia/entrypage.html", {
                 "entrytitle": title,
-                "entry": html
+                "entry": html,
             })
+
+def editpage(request):
+    if request.method == "POST":
+        title = request.POST['title']
+        text = util.get_entry(title)
+        return render(request, "encyclopedia/editpage.html", {
+            "entrytext": text,
+            "entrytitle": title,
+        })
+        
+def saveedit(request):
+    if request.method == "POST":
+        title = request.POST['title']
+        text = "#"+title+"\n\n"+request.POST['text']
+        util.save_entry(title, text)
+        html = converter(title)
+        return render(request, "encyclopedia/entry.html", {
+            "entrytitle": title,
+            "entry": html,
+        })
