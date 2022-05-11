@@ -8,6 +8,7 @@
     {{ entry|safe }}
     <form action="{% url 'editpage' %}" method="POST">
         {% csrf_token %}
+        <input type="hidden" name="title" value="{{entrytitle}}">
         <button type="submit">Edit</button>
     </form>
 {% endblock %}
