@@ -52,12 +52,13 @@ def savepage(request):
         title = request.POST['newpagetitle']
         text = "#"+title+"\n\n"+request.POST['newpagetext']
         if title in util.list_entries():
-            return render(request, "encyclopedia/alreadyexists.html")
+            return render(request, "encyclopedia/alreadyexists.html", {
+                "query": title,
+            })
         elif title == "":
             return render(request, "encyclopedia/newpage.html")
         else:
             util.save_entry(title, text)
-            html = converter(title)
             return redirect(entrypage, entry = title)
 
 def editpage(request):
