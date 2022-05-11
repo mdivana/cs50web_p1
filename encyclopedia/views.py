@@ -3,6 +3,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import redirect, render
 from markdown2 import Markdown
 from . import util
+from random import choice
 
 
 def index(request):
@@ -76,4 +77,9 @@ def saveedit(request):
         text = request.POST['text']
         util.save_entry(title, text)
         html = converter(title)
+        return redirect(entrypage, entry = title)
+
+def randompage(request):
+    if request.method == "GET":
+        title = choice(util.list_entries())
         return redirect(entrypage, entry = title)
