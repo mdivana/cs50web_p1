@@ -1,5 +1,3 @@
-from django.urls import reverse
-from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import redirect, render
 from markdown2 import Markdown
 from . import util
